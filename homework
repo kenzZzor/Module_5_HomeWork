@@ -1,0 +1,230 @@
+public interface IVehicle
+{
+    void Drive();
+    void Refuel();
+}
+
+public class Car : IVehicle
+{
+    public string Brand { get; set; }
+    public string Model { get; set; }
+    public string FuelType { get; set; }
+
+    public Car(string brand, string model, string fuelType)
+    {
+        Brand = brand;
+        Model = model;
+        FuelType = fuelType;
+    }
+
+    public void Drive()
+    {
+        Console.WriteLine($"{Brand} {Model} is driving.");
+    }
+
+    public void Refuel()
+    {
+        Console.WriteLine($"{Brand} {Model} is being refueled with {FuelType}.");
+    }
+}
+
+public class Motorcycle : IVehicle
+{
+    public string Type { get; set; }
+    public int EngineCapacity { get; set; }
+
+    public Motorcycle(string type, int engineCapacity)
+    {
+        Type = type;
+        EngineCapacity = engineCapacity;
+    }
+
+    public void Drive()
+    {
+        Console.WriteLine($"The {Type} motorcycle with {EngineCapacity}cc engine is driving.");
+    }
+
+    public void Refuel()
+    {
+        Console.WriteLine($"The {Type} motorcycle is being refueled.");
+    }
+}
+
+public class Truck : IVehicle
+{
+    public int LoadCapacity { get; set; }
+    public int AxleCount { get; set; }
+
+    public Truck(int loadCapacity, int axleCount)
+    {
+        LoadCapacity = loadCapacity;
+        AxleCount = axleCount;
+    }
+
+    public void Drive()
+    {
+        Console.WriteLine($"The truck with {LoadCapacity}kg capacity and {AxleCount} axles is driving.");
+    }
+
+    public void Refuel()
+    {
+        Console.WriteLine($"The truck is being refueled.");
+    }
+}
+
+
+public abstract class VehicleFactory
+{
+    public abstract IVehicle CreateVehicle();
+}
+
+
+public class CarFactory : VehicleFactory
+{
+    private string _brand;
+    private string _model;
+    private string _fuelType;
+
+    public CarFactory(string brand, string model, string fuelType)
+    {
+        _brand = brand;
+        _model = model;
+        _fuelType = fuelType;
+    }
+
+    public override IVehicle CreateVehicle()
+    {
+        return new Car(_brand, _model, _fuelType);
+    }
+}
+
+public class MotorcycleFactory : VehicleFactory
+{
+    private string _type;
+    private int _engineCapacity;
+
+    public MotorcycleFactory(string type, int engineCapacity)
+    {
+        _type = type;
+        _engineCapacity = engineCapacity;
+    }
+
+    public override IVehicle CreateVehicle()
+    {
+        return new Motorcycle(_type, _engineCapacity);
+    }
+}
+
+public class TruckFactory : VehicleFactory
+{
+    private int _loadCapacity;
+    private int _axleCount;
+
+    public TruckFactory(int loadCapacity, int axleCount)
+    {
+        _loadCapacity = loadCapacity;
+        _axleCount = axleCount;
+    }
+
+    public override IVehicle CreateVehicle()
+    {
+        return new Truck(_loadCapacity, _axleCount);
+    }
+}
+
+
+public class Bus : IVehicle
+{
+    public int PassengerCapacity { get; set; }
+    public string RouteNumber { get; set; }
+
+    public Bus(int passengerCapacity, string routeNumber)
+    {
+        PassengerCapacity = passengerCapacity;
+        RouteNumber = routeNumber;
+    }
+
+    public void Drive()
+    {
+        Console.WriteLine($"The bus with route number {RouteNumber} and capacity of {PassengerCapacity} passengers is driving.");
+    }
+
+    public void Refuel()
+    {
+        Console.WriteLine("The bus is being refueled.");
+    }
+}
+
+public class BusFactory : VehicleFactory
+{
+    private int _passengerCapacity;
+    private string _routeNumber;
+
+    public BusFactory(int passengerCapacity, string routeNumber)
+    {
+        _passengerCapacity = passengerCapacity;
+        _routeNumber = routeNumber;
+    }
+
+    public override IVehicle CreateVehicle()
+    {
+        return new Bus(_passengerCapacity, _routeNumber);
+    }
+}
+
+
+public class VehicleSystem
+{
+    public static IVehicle CreateVehicleBasedOnInput()
+    {
+        Console.WriteLine("Choose vehicle type (car, motorcycle, truck, bus):");
+        string vehicleType = Console.ReadLine().ToLower();
+
+        switch (vehicleType)
+        {
+            case "car":
+                Console.WriteLine("Enter brand:");
+                string brand = Console.ReadLine();
+                Console.WriteLine("Enter model:");
+                string model = Console.ReadLine();
+                Console.WriteLine("Enter fuel type:");
+                string fuelType = Console.ReadLine();
+                return new CarFactory(brand, model, fuelType).CreateVehicle();
+
+            case "motorcycle":
+                Console.WriteLine("Enter motorcycle type (sport, touring):");
+                string type = Console.ReadLine();
+                Console.WriteLine("Enter engine capacity (cc):");
+                int engineCapacity = int.Parse(Console.ReadLine());
+                return new MotorcycleFactory(type, engineCapacity).CreateVehicle();
+
+            case "truck":
+                Console.WriteLine("Enter load capacity (kg):");
+                int loadCapacity = int.Parse(Console.ReadLine());
+                Console.WriteLine("Enter number of axles:");
+                int axleCount = int.Parse(Console.ReadLine());
+                return new TruckFactory(loadCapacity, axleCount).CreateVehicle();
+
+            case "bus":
+                Console.WriteLine("Enter passenger capacity:");
+                int passengerCapacity = int.Parse(Console.ReadLine());
+                Console.WriteLine("Enter route number:");
+                string routeNumber = Console.ReadLine();
+                return new BusFactory(passengerCapacity, routeNumber).CreateVehicle();
+
+            default:
+                throw new InvalidOperationException("Unknown vehicle type.");
+        }
+    }
+}
+
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        IVehicle vehicle = VehicleSystem.CreateVehicleBasedOnInput();
+        vehicle.Drive();
+        vehicle.Refuel();
+    }
+}
